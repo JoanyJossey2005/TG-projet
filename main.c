@@ -31,7 +31,11 @@ typedef struct Graphe {
 /* Correspondance entre les sommets et les animaux */
 const char* correspondance[] = {
         "herbe", "lapin", "souris", "insecte",
-        "renard", "hibou", "faucon", "belette", "grenouille"
+        "renard", "hibou", "faucon", "belette", "grenouille", "loup","cerf","escargot",
+       "chouette",
+       "ecureuil",
+       "vipere",
+        "blaireau"
 };
 
 /* Création d'un graphe */
