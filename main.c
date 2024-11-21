@@ -142,6 +142,61 @@ void graphe_afficher(Graphe* graphe) {
     }
 }
 
+void trouver_premiers_maillons(Graphe* graphe) {
+    printf("\nPremiers maillons (sans predecesseurs) :\n");
+    for (int i = 0; i < graphe->ordre; i++) {
+        int a_predecesseur = 0;
+        for (int j = 0; j < graphe->ordre; j++) {
+            pArc arc = graphe->pSommet[j]->arc;
+            while (arc) {
+                if (arc->sommet == i) {
+                    a_predecesseur = 1;
+                    break;
+                }
+                arc = arc->arc_suivant;
+            }
+            if (a_predecesseur) break;
+        }
+        if (!a_predecesseur) {
+            printf("- %d (%s)\n", i, correspondance[i]);
+        }
+    }
+}
+
+void trouver_derniers_maillons(Graphe* graphe) {
+    printf("\nDerniers maillons (sans successeurs) :\n");
+    for (int i = 0; i < graphe->ordre; i++) {
+        if (graphe->pSommet[i]->arc == NULL) {
+            printf("- %d (%s)\n", i, correspondance[i]);
+        }
+    }
+}
+
+void trouver_une_seule_source_alimentation(Graphe* graphe) {
+    printf("\nEspeces ayant une seule source d'alimentation :\n");
+    for (int i = 0; i < graphe->ordre; i++) {
+        int nb_pred = 0;
+        for (int j = 0; j < graphe->ordre; j++) {
+            pArc arc = graphe->pSommet[j]->arc;
+            while (arc) {
+                if (arc->sommet == i) {
+                    nb_pred++;
+                    if (nb_pred > 1) break;
+                }
+                arc = arc->arc_suivant;
+            }
+            if (nb_pred > 1) break;
+        }
+        if (nb_pred == 1) {
+            printf("- %d (%s)\n", i, correspondance[i]);
+        }
+    }
+}
+
+
+
+
+
 int main() {
     char nomFichier[50];
     printf("Entrez le nom du fichier contenant le graphe : ");
@@ -149,6 +204,10 @@ int main() {
 
     Graphe* graphe = lire_graphe(nomFichier);
     graphe_afficher(graphe);
+
+    trouver_premiers_maillons(graphe);
+    trouver_derniers_maillons(graphe);
+    trouver_une_seule_source_alimentation(graphe);
 
     // Libération de la mémoire
     for (int i = 0; i < graphe->ordre; i++) {
