@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* Structure d'un arc */
 struct Arc {
     int sommet; // Numéro du sommet de destination
+    int poids;  // Poids de l'arc
     struct Arc* arc_suivant;
 };
 
@@ -31,11 +33,8 @@ typedef struct Graphe {
 /* Correspondance entre les sommets et les animaux */
 const char* correspondance[] = {
         "herbe", "lapin", "souris", "insecte",
-        "renard", "hibou", "faucon", "belette", "grenouille", "loup","cerf","escargot",
-       "chouette",
-       "ecureuil",
-       "vipere",
-        "blaireau"
+        "renard", "hibou", "faucon", "belette", "grenouille", "loup", "cerf", "escargot",
+        "chouette", "ecureuil", "vipere", "blaireau"
 };
 
 /* Création d'un graphe */
@@ -55,10 +54,12 @@ Graphe* CreerGraphe(int ordre) {
     return graphe;
 }
 
+
 /* Ajouter une arête ou un arc entre deux sommets */
-pSommet* CreerArete(pSommet* sommet, int s1, int s2) {
+pSommet* CreerArete(pSommet* sommet, int s1, int s2, int poids) {
     pArc nouvelArc = (pArc)malloc(sizeof(struct Arc));
     nouvelArc->sommet = s2;
+    nouvelArc->poids = poids;
     nouvelArc->arc_suivant = sommet[s1]->arc;
     sommet[s1]->arc = nouvelArc;
     return sommet;
@@ -82,14 +83,13 @@ Graphe* lire_graphe(char* nomFichier) {
     graphe->taille = taille;
     graphe->orientation = orientation;
 
-    int s1, s2;
+    int s1, s2, poids;
     for (int i = 0; i < taille; i++) {
-        fscanf(fichier, "%d %d", &s1, &s2);
-        graphe->pSommet = CreerArete(graphe->pSommet, s1, s2);
+        fscanf(fichier, "%d %d %d", &s1, &s2, &poids);
+        graphe->pSommet = CreerArete(graphe->pSommet, s1, s2, poids);
 
-        // Si le graphe est non orienté, ajouter l'arête dans les deux sens
         if (!orientation) {
-            graphe->pSommet = CreerArete(graphe->pSommet, s2, s1);
+            graphe->pSommet = CreerArete(graphe->pSommet, s2, s1, poids);
         }
     }
 
@@ -102,44 +102,72 @@ void afficher_successeurs(pSommet* sommet, int num) {
     printf("Successeurs du sommet %d (%s) : ", num, correspondance[num]);
     pArc arc = sommet[num]->arc;
     while (arc) {
-        printf("%d (%s) ", arc->sommet, correspondance[arc->sommet]);
+        printf("%d (%s,%d) , ", arc->sommet, correspondance[arc->sommet], arc->poids);
         arc = arc->arc_suivant;
     }
     printf("\n");
 }
 
-/* Affichage des prédécesseurs d'un sommet */
-void afficher_predecesseurs(Graphe* graphe, int num) {
-    printf("Predecesseurs du sommet %d (%s) : ", num, correspondance[num]);
+/* Algorithme de Dijkstra */
+void dijkstra(Graphe* graphe, int source, int destination) {
+    int* distances = (int*)malloc(graphe->ordre * sizeof(int));
+    int* precedents = (int*)malloc(graphe->ordre * sizeof(int));
+    int* visite = (int*)calloc(graphe->ordre, sizeof(int));
+
     for (int i = 0; i < graphe->ordre; i++) {
-        pArc arc = graphe->pSommet[i]->arc;
+        distances[i] = INT_MAX;
+        precedents[i] = -1;
+    }
+    distances[source] = 0;
+
+    for (int i = 0; i < graphe->ordre; i++) {
+        int minDistance = INT_MAX;
+        int u = -1;
+
+        for (int j = 0; j < graphe->ordre; j++) {
+            if (!visite[j] && distances[j] < minDistance) {
+                minDistance = distances[j];
+                u = j;
+            }
+        }
+
+        if (u == -1) break;
+        visite[u] = 1;
+
+        pArc arc = graphe->pSommet[u]->arc;
         while (arc) {
-            if (arc->sommet == num) {
-                printf("%d (%s) ", i, correspondance[i]);
+            int v = arc->sommet;
+            int poids = arc->poids;
+            if (!visite[v] && distances[u] + poids < distances[v]) {
+                distances[v] = distances[u] + poids;
+                precedents[v] = u;
             }
             arc = arc->arc_suivant;
         }
     }
-    printf("\n");
-}
 
-/* Affichage complet du graphe */
-void graphe_afficher(Graphe* graphe) {
-    printf("Graphe d'ordre %d \n", graphe->ordre);
-    if (graphe->orientation) {
-        printf("Le graphe est oriente.\n");
+    if (distances[destination] == INT_MAX) {
+        printf("Aucun chemin trouvé entre %d (%s) et %d (%s).\n",
+               source, correspondance[source], destination, correspondance[destination]);
     } else {
-        printf("Le graphe est non oriente.\n");
+        printf("Chemin le plus court entre %d (%s) et %d (%s) :\n",
+               source, correspondance[source], destination, correspondance[destination]);
+        printf("Poids totale : %d\n", distances[destination]);
+
+        int chemin[graphe->ordre];
+        int index = 0;
+        for (int at = destination; at != -1; at = precedents[at]) {
+            chemin[index++] = at;
+        }
+        for (int i = index - 1; i >= 0; i--) {
+            printf("%d (%s) -> ", chemin[i], correspondance[chemin[i]]);
+        }
+        printf("\n");
     }
-    printf("\nCorrespondance des sommets avec les animaux :\n");
-    for (int i = 0; i < graphe->ordre; i++) {
-        printf("%d : %s\n", i, correspondance[i]);
-    }
-    printf("\nListes d'adjacence :\n");
-    for (int i = 0; i < graphe->ordre; i++) {
-        afficher_successeurs(graphe->pSommet, i);
-        afficher_predecesseurs(graphe, i);
-    }
+
+    free(distances);
+    free(precedents);
+    free(visite);
 }
 
 void trouver_premiers_maillons(Graphe* graphe) {
@@ -193,9 +221,19 @@ void trouver_une_seule_source_alimentation(Graphe* graphe) {
     }
 }
 
-
-
-
+/* Affichage complet du graphe */
+void graphe_afficher(Graphe* graphe) {
+    printf("Graphe d'ordre %d\n", graphe->ordre);
+    if (graphe->orientation) {
+        printf("Le graphe est oriente.\n");
+    } else {
+        printf("Le graphe est non oriente.\n");
+    }
+    printf("\nListes d'adjacence :\n");
+    for (int i = 0; i < graphe->ordre; i++) {
+        afficher_successeurs(graphe->pSommet, i);
+    }
+}
 
 int main() {
     char nomFichier[50];
@@ -209,7 +247,17 @@ int main() {
     trouver_derniers_maillons(graphe);
     trouver_une_seule_source_alimentation(graphe);
 
-    // Libération de la mémoire
+
+    int source, destination;
+    printf("Entrez le sommet de depart : ");
+    scanf("%d", &source);
+    printf("Entrez le sommet de destination : ");
+    scanf("%d", &destination);
+
+    dijkstra(graphe, source, destination);
+
+
+
     for (int i = 0; i < graphe->ordre; i++) {
         pArc arc = graphe->pSommet[i]->arc;
         while (arc) {
