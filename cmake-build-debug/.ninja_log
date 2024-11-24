@@ -1,10 +1,7 @@
 # ninja log v5
-1	1731	7541747038842635	CMakeFiles/TG_projet.dir/main.c.obj	992f6a953255720
-1732	2388	7541747045305028	TG_projet.exe	a8a4f56e50715f50
-9	87	7541752201002531	CMakeFiles/TG_projet.dir/test.c.obj	1a72fbf00677122e
 2	92	7541752201043631	CMakeFiles/TG_projet.dir/main.c.obj	992f6a953255720
-14	95	7541752201084309	CMakeFiles/TG_projet.dir/bfs.c.obj	9336330be397e5f0
-1	69	7541753123356099	CMakeFiles/TG_projet.dir/bfs.c.obj	9336330be397e5f0
-1	60	7541755368685349	CMakeFiles/TG_projet.dir/test.c.obj	1a72fbf00677122e
-1	68	7541756355086358	CMakeFiles/TG_projet.dir/test.c.obj	1a72fbf00677122e
 68	116	7541756355543440	TG_projet.exe	1adaaf726a77f6ea
+1	68	7541756355086358	CMakeFiles/TG_projet.dir/test.c.obj	1a72fbf00677122e
+1	69	7541753123356099	CMakeFiles/TG_projet.dir/bfs.c.obj	9336330be397e5f0
+1	61	7541763429603169	CMakeFiles/TG_projet.dir/dijkstra.c.obj	15ccb71d7b84752
+61	125	7541763430227551	TG_projet.exe	a3f788d9865ec016

@@ -11,4 +11,6 @@ add_executable(TG_projet
         test.c
         bfs.h
         bfs.c
+        dijkstra.h
+        dijkstra.c
 )

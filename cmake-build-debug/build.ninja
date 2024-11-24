@@ -70,6 +70,13 @@ build CMakeFiles/TG_projet.dir/bfs.c.obj: C_COMPILER__TG_projet_unscanned_Debug 
   OBJECT_DIR = CMakeFiles\TG_projet.dir
   OBJECT_FILE_DIR = CMakeFiles\TG_projet.dir
 
+build CMakeFiles/TG_projet.dir/dijkstra.c.obj: C_COMPILER__TG_projet_unscanned_Debug C$:/Melanie/Informatique/TG-projet/dijkstra.c || cmake_object_order_depends_target_TG_projet
+  DEP_FILE = CMakeFiles\TG_projet.dir\dijkstra.c.obj.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  INCLUDES = -IC:/Melanie/Informatique/TG-projet/.
+  OBJECT_DIR = CMakeFiles\TG_projet.dir
+  OBJECT_FILE_DIR = CMakeFiles\TG_projet.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target TG_projet
@@ -78,7 +85,7 @@ build CMakeFiles/TG_projet.dir/bfs.c.obj: C_COMPILER__TG_projet_unscanned_Debug 
 #############################################
 # Link the executable TG_projet.exe
 
-build TG_projet.exe: C_EXECUTABLE_LINKER__TG_projet_Debug CMakeFiles/TG_projet.dir/main.c.obj CMakeFiles/TG_projet.dir/test.c.obj CMakeFiles/TG_projet.dir/bfs.c.obj
+build TG_projet.exe: C_EXECUTABLE_LINKER__TG_projet_Debug CMakeFiles/TG_projet.dir/main.c.obj CMakeFiles/TG_projet.dir/test.c.obj CMakeFiles/TG_projet.dir/bfs.c.obj CMakeFiles/TG_projet.dir/dijkstra.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\TG_projet.dir
