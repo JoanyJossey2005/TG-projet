@@ -8,4 +8,7 @@ include_directories(.)
 add_executable(TG_projet
         main.c
         Reseau.h
+        test.c
+        bfs.h
+        bfs.c
 )

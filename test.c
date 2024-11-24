@@ -9,42 +9,42 @@
 #include <limits.h>
 
 /* Structure d'un arc */
-struct Arc {
+struct Arcss {
     int sommet; // Numéro du sommet de destination
     int poids;  // Poids de l'arc
-    struct Arc* arc_suivant;
+    struct Arcss* arc_suivant;
 };
 
 /* Alias pour un pointeur sur Arc */
-typedef struct Arc* pArc;
+typedef struct Arcss* pArcss;
 
 /* Structure d'un sommet */
-struct Sommet {
-    struct Arc* arc; // Liste des arcs partant de ce sommet
+struct Sommetss {
+    struct Arcss* arc; // Liste des arcs partant de ce sommet
     int valeur;
 };
 
 /* Alias pour un pointeur sur Sommet */
-typedef struct Sommet* pSommet;
+typedef struct Sommetss* pSommetss;
 
 /* Structure du graphe */
-typedef struct Graphe {
+typedef struct Graphess {
     int ordre;      // Nombre de sommets
     int taille;     // Nombre d'arêtes ou arcs
     int orientation; // 1 si orienté, 0 sinon
-    pSommet* pSommet; // Tableau de pointeurs vers les sommets
-} Graphe;
+    pSommetss* pSommet; // Tableau de pointeurs vers les sommets
+} Graphess;
 
 /* Création d'un graphe */
-Graphe* CreerGraphe(int ordre) {
-    Graphe* graphe = (Graphe*)malloc(sizeof(Graphe));
+Graphess* CreerGraphes(int ordre) {
+    Graphess* graphe = (Graphess*)malloc(sizeof(Graphess));
     graphe->ordre = ordre;
     graphe->taille = 0;
     graphe->orientation = 0;
-    graphe->pSommet = (pSommet*)malloc(ordre * sizeof(pSommet));
+    graphe->pSommet = (pSommetss*)malloc(ordre * sizeof(pSommetss));
 
     for (int i = 0; i < ordre; i++) {
-        graphe->pSommet[i] = (pSommet)malloc(sizeof(struct Sommet));
+        graphe->pSommet[i] = (pSommetss)malloc(sizeof(struct Sommetss));
         graphe->pSommet[i]->arc = NULL;
         graphe->pSommet[i]->valeur = i;
     }
@@ -53,8 +53,8 @@ Graphe* CreerGraphe(int ordre) {
 }
 
 /* Ajouter une arête ou un arc entre deux sommets */
-pSommet* CreerArete(pSommet* sommet, int s1, int s2, int poids) {
-    pArc nouvelArc = (pArc)malloc(sizeof(struct Arc));
+pSommetss* CreerAretes(pSommetss* sommet, int s1, int s2, int poids) {
+    pArcss nouvelArc = (pArcss)malloc(sizeof(struct Arcss));
     nouvelArc->sommet = s2;
     nouvelArc->poids = poids;
     nouvelArc->arc_suivant = sommet[s1]->arc;
@@ -63,7 +63,7 @@ pSommet* CreerArete(pSommet* sommet, int s1, int s2, int poids) {
 }
 
 /* Lecture d'un graphe à partir d'un fichier */
-Graphe* lire_graphe(char* nomFichier) {
+Graphess* lire_graphes(char* nomFichier) {
     FILE* fichier = fopen(nomFichier, "r");
     if (!fichier) {
         perror("Erreur lors de l'ouverture du fichier");
@@ -73,7 +73,7 @@ Graphe* lire_graphe(char* nomFichier) {
     int ordre, taille, orientation;
     fscanf(fichier, "%d", &ordre);
 
-    Graphe* graphe = CreerGraphe(ordre);
+    Graphess* graphe = CreerGraphes(ordre);
 
     fscanf(fichier, "%d", &taille);
     fscanf(fichier, "%d", &orientation);
@@ -83,10 +83,10 @@ Graphe* lire_graphe(char* nomFichier) {
     int s1, s2, poids;
     for (int i = 0; i < taille; i++) {
         fscanf(fichier, "%d %d %d", &s1, &s2, &poids);
-        graphe->pSommet = CreerArete(graphe->pSommet, s1, s2, poids);
+        graphe->pSommet = CreerAretes(graphe->pSommet, s1, s2, poids);
 
         if (!orientation) {
-            graphe->pSommet = CreerArete(graphe->pSommet, s2, s1, poids);
+            graphe->pSommet = CreerAretes(graphe->pSommet, s2, s1, poids);
         }
     }
 
@@ -95,7 +95,7 @@ Graphe* lire_graphe(char* nomFichier) {
 }
 
 /* Lecture de la correspondance des animaux */
-char** lire_correspondance(char* nomFichier, int ordre) {
+char** lire_correspondances(char* nomFichier, int ordre) {
     FILE* fichier = fopen(nomFichier, "r");
     if (!fichier) {
         perror("Erreur lors de l'ouverture du fichier de correspondance");
@@ -116,7 +116,7 @@ char** lire_correspondance(char* nomFichier, int ordre) {
 }
 
 /* Libération de la mémoire de la correspondance */
-void liberer_correspondance(char** correspondance, int ordre) {
+void liberer_correspondances(char** correspondance, int ordre) {
     for (int i = 0; i < ordre; i++) {
         free(correspondance[i]);
     }
@@ -124,9 +124,9 @@ void liberer_correspondance(char** correspondance, int ordre) {
 }
 
 /* Affichage des successeurs d'un sommet */
-void afficher_successeurs(pSommet* sommet, int num, char** correspondance) {
+void afficher_successeurss(pSommetss* sommet, int num, char** correspondance) {
     printf("Successeurs du sommet %d (%s) : ", num, correspondance[num]);
-    pArc arc = sommet[num]->arc;
+    pArcss arc = sommet[num]->arc;
     while (arc) {
         printf("%d (%s, %d) , ", arc->sommet, correspondance[arc->sommet], arc->poids);
         arc = arc->arc_suivant;
@@ -135,7 +135,7 @@ void afficher_successeurs(pSommet* sommet, int num, char** correspondance) {
 }
 
 /* Algorithme de Dijkstra */
-void dijkstra(Graphe* graphe, int source, int destination, char** correspondance) {
+void dijkstras(Graphess* graphe, int source, int destination, char** correspondance) {
     int* distances = (int*)malloc(graphe->ordre * sizeof(int));
     int* precedents = (int*)malloc(graphe->ordre * sizeof(int));
     int* visite = (int*)calloc(graphe->ordre, sizeof(int));
@@ -160,7 +160,7 @@ void dijkstra(Graphe* graphe, int source, int destination, char** correspondance
         if (u == -1) break;
         visite[u] = 1;
 
-        pArc arc = graphe->pSommet[u]->arc;
+        pArcss arc = graphe->pSommet[u]->arc;
         while (arc) {
             int v = arc->sommet;
             int poids = arc->poids;
@@ -197,12 +197,12 @@ void dijkstra(Graphe* graphe, int source, int destination, char** correspondance
 }
 
 /* Fonction pour trouver les premiers maillons */
-void trouver_premiers_maillons(Graphe* graphe, char** correspondance) {
+void trouver_premiers_maillonss(Graphess* graphe, char** correspondance) {
     printf("\nPremiers maillons (sans prédécesseurs) :\n");
     for (int i = 0; i < graphe->ordre; i++) {
         int a_predecesseur = 0;
         for (int j = 0; j < graphe->ordre; j++) {
-            pArc arc = graphe->pSommet[j]->arc;
+            pArcss arc = graphe->pSommet[j]->arc;
             while (arc) {
                 if (arc->sommet == i) {
                     a_predecesseur = 1;
@@ -219,7 +219,7 @@ void trouver_premiers_maillons(Graphe* graphe, char** correspondance) {
 }
 
 /* Fonction pour trouver les derniers maillons */
-void trouver_derniers_maillons(Graphe* graphe, char** correspondance) {
+void trouver_derniers_maillonss(Graphess* graphe, char** correspondance) {
     printf("\nDerniers maillons (sans successeurs) :\n");
     for (int i = 0; i < graphe->ordre; i++) {
         if (graphe->pSommet[i]->arc == NULL) {
@@ -229,12 +229,12 @@ void trouver_derniers_maillons(Graphe* graphe, char** correspondance) {
 }
 
 /* Fonction pour trouver les espèces avec une seule source d'alimentation */
-void trouver_une_seule_source_alimentation(Graphe* graphe, char** correspondance) {
+void trouver_une_seule_source_alimentations(Graphess* graphe, char** correspondance) {
     printf("\nEspèces ayant une seule source d'alimentation :\n");
     for (int i = 0; i < graphe->ordre; i++) {
         int nb_pred = 0;
         for (int j = 0; j < graphe->ordre; j++) {
-            pArc arc = graphe->pSommet[j]->arc;
+            pArcss arc = graphe->pSommet[j]->arc;
             while (arc) {
                 if (arc->sommet == i) {
                     nb_pred++;
@@ -249,7 +249,7 @@ void trouver_une_seule_source_alimentation(Graphe* graphe, char** correspondance
 }
 
 /* Programme principal */
-int main() {
+int mains() {
     char nomFichierGraphe[50];
     char nomFichierAnimaux[50];
 
@@ -258,12 +258,12 @@ int main() {
     printf("Entrez le nom du fichier contenant les noms des animaux : ");
     scanf("%s", nomFichierAnimaux);
 
-    Graphe* graphe = lire_graphe(nomFichierGraphe);
-    char** correspondance = lire_correspondance(nomFichierAnimaux, graphe->ordre);
+    Graphess* graphe = lire_graphes(nomFichierGraphe);
+    char** correspondance = lire_correspondances(nomFichierAnimaux, graphe->ordre);
 
-    trouver_premiers_maillons(graphe, correspondance);
-    trouver_derniers_maillons(graphe, correspondance);
-    trouver_une_seule_source_alimentation(graphe, correspondance);
+    trouver_premiers_maillonss(graphe, correspondance);
+    trouver_derniers_maillonss(graphe, correspondance);
+    trouver_une_seule_source_alimentations(graphe, correspondance);
 
     int source, destination;
     printf("Entrez le sommet de départ : ");
@@ -271,19 +271,19 @@ int main() {
     printf("Entrez le sommet de destination : ");
     scanf("%d", &destination);
 
-    dijkstra(graphe, source, destination, correspondance);
+    dijkstras(graphe, source, destination, correspondance);
 
     for (int i = 0; i < graphe->ordre; i++) {
-        pArc arc = graphe->pSommet[i]->arc;
+        pArcss arc = graphe->pSommet[i]->arc;
         while (arc) {
-            pArc temp = arc;
+            pArcss temp = arc;
             arc = arc->arc_suivant;
             free(temp);
         }
         free(graphe->pSommet[i]);
     }
 
-    liberer_correspondance(correspondance, graphe->ordre);
+    liberer_correspondances(correspondance, graphe->ordre);
     free(graphe->pSommet);
     free(graphe);
 
